@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        button {
+            background-color: #ff5c5c;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #quote {
+            margin-top: 20px;
+            font-size: 20px;
+            font-style: italic;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Gradient Copy Button Style */
+        .copy-btn {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .copy-btn:hover {
+            background: linear-gradient(to right, #feb47b, #ff7e5f);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Generate a Caption for Your Post<h5> ~Aroop Sarkar💕</h5></h1>
+        <input type="file" id="photoUpload" accept="image/*" style="margin-top: 20px;">
+        <br>
+        <button onclick="generateQuote()">Generate Quote</button>
+        <div id="loading">
+            <div class="loader"></div>
+            <p>Loading...</p>
+        </div>
+        <div id="quote"></div>
+        <button class="copy-btn" id="copyButton" style="display: none;" onclick="copyQuote()">Copy Quote</button>
+    </div>
+
+    <script>
+        function generateQuote() {
+            // Show loading animation
+            document.getElementById('loading').style.display = 'block';
+
+            // Get the uploaded photo
+            var photo = document.getElementById('photoUpload').files[0];
+            var formData = new FormData();
+            formData.append("photo", photo);
+
+            // Simulate the quote generation process
+            setTimeout(function() {
+                // Hide loading animation
+                document.getElementById('loading').style.display = 'none';
+
+                // Send POST request to Flask to get a random quote
+                fetch('/generate_quote', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Display the quote
+                    var quoteText = data.quote;
+                    document.getElementById('quote').innerText = quoteText;
+
+                    // Show the "Copy Quote" button
+                    document.getElementById('copyButton').style.display = 'inline-block';
+                })
+                .catch(error => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('quote').innerText = 'Error generating quote, please try again.';
+                });
+            }, 2000); // Simulate delay
+        }
+
+        function copyQuote() {
+            var quoteText = document.getElementById('quote').innerText;
+
+            // Create a temporary text area to copy the quote text
+            var textArea = document.createElement('textarea');
+            textArea.value = quoteText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            // Alert the user that the quote has been copied
+            alert("Quote copied to clipboard!");
+        }
+    </script>
+
+</body>
+</html>
